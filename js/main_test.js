@@ -1,16 +1,15 @@
 //execute script when window is loaded
 window.onload = function(){
-    //SVG dimension variables
+    
     var w = 900, h = 500;
-    //Example 1.5 line 1...container block
-    var container = d3.select("body") //get the <body> element from the DOM
-        .append("svg") //put a new svg in the body
-        .attr("width", w) //assign the width
-        .attr("height", h) //assign the height
-        .attr("class", "container") //assign a class name
-        .style("background-color", "rgba(0,0,0,0.2)"); //svg background color
 
-    //Example 1.8 line 1...innerRect block
+    var container = d3.select("body") //get the <body> element from the DOM
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("class", "container")
+        .style("background-color", "rgba(0,0,0,0.2)");
+    
     var innerRect = container.append("rect")
         .datum(400) //a single value is a DATUM
         .attr("width", function(d){ //rectangle width
@@ -43,11 +42,7 @@ window.onload = function(){
         }
     ];
     
-    //above Example 2.8 line 20
-    var x = d3.scaleLinear()  //create the scale
-        .range([90, 810]) //output min and max
-        .domain([0, 3]); //input min and max
-    
+    //find the minimum value of the array
     var minPop = d3.min(cityPop, function(d){
         return d.population;
     });
@@ -56,15 +51,16 @@ window.onload = function(){
     var maxPop = d3.max(cityPop, function(d){
         return d.population;
     });
-
+    
     //scale for circles center y coordinate
     var y = d3.scaleLinear()
-        .range([440, 95])
-        .domain([
-            minPop,
-            maxPop
-        ]);
-        //color scale generator 
+        .range([450, 50])
+        .domain([0, 700000]);
+    
+    var x = d3.scaleLinear()  //create the scale
+        .range([90, 750]) //output min and max
+        .domain([0, 3]); //input min and max
+    
     var color = d3.scaleLinear()
         .range([
             "#FDBE85",
@@ -74,7 +70,7 @@ window.onload = function(){
             minPop, 
             maxPop
         ]);
-    //Example 2.6 line 3
+
     var circles = container.selectAll(".circles") //create an empty selection
         .data(cityPop) //here we feed in an array
         .enter() //one of the great mysteries of the universe
@@ -92,10 +88,10 @@ window.onload = function(){
             //use the index to place each circle horizontally
             return x(i);
         })
-        //Example 2.8 line 38
         .attr("cy", function(d){
+            //subtract value from 450 to "grow" circles up from the bottom instead of down from the top of the SVG
             return y(d.population);
-        })        
+        })
         .style("fill", function(d, i){ //add a fill based on the color scale generator
             return color(d.population);
         })
