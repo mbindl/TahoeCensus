@@ -1,0 +1,133 @@
+.navbar {
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 24px;
+    color: #6c83b5;
+    background-color: white;
+    border-color: transparent;
+    box-shadow: 0px 1px 7px #888888;
+}
+
+.navbar-brand {
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 28px;
+    color: #4D4D4D;
+}
+
+.button {
+    background-color: #345387;
+    border: 1px solid #1e3151;
+    box-shadow: 1px 1px 7px #888888;
+    padding: 7px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+#row-1 {
+    padding-top: 10px;
+}
+
+.title {
+    margin-top: 0px;
+    font-family: Tw Cen MT Condensed, sans-serif;
+    text-align: center;
+    background-color: #6c83b5;
+    color: white;
+}
+
+.thumb {  
+    max-height: 340px;
+    max-width: 300px;
+    border-radius: 6px;
+    border: 3px solid #4D4D4D;
+    box-shadow: 1px 1px 7px #888888;
+    margin-bottom: 20px;
+    margin: 20px auto;    
+    display: block;
+}
+
+.thumb:hover {
+    border-color: gold;
+}
+
+#contact-row {
+    padding-top: 20px;
+    min-height: 200px;
+}
+
+#contact {
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 18px;
+    color: #4D4D4D;
+    font-weight: bold;
+}
+
+.minilogo {
+    height: 55px;
+    width: 55px;
+}
+
+#links-web {
+    display: table;
+    height: 100px;
+    width: 100%;
+    text-align: center;
+    padding-top:10px;
+}
+
+#links-mobile {
+    display: table;
+    height: 100px;
+    width: 100%;
+    text-align: center;
+    padding-bottom: 20px;
+    padding-top: 10px;
+}
+
+#spanning {
+    display: inline;
+    vertical-align: middle;
+    letter-spacing: normal;
+}
+
+@media screen and (max-width : 768px){
+    .desk{display: none;}
+    .div-only-mobile{visibility:visible;}
+}
+
+@media screen and (min-width : 769px){
+    .div-only-mobile{display: none;}
+    .desk {display: visible;}
+}
+.shadow {
+    text-shadow: 1px 1px black;
+    text-align: center;
+}
+.align-left {
+    text-align: left;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.max-width{
+    max-width: 450px
+}
+#scroll-button {
+    width: 60px;
+    height: 60px;
+    opacity: .7;
+}
+.no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+#info-graphic {
+    width: 100%;
+}
