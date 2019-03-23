@@ -13,77 +13,33 @@
     color: #4D4D4D;
 }
 
-.button {
-    background-color: #345387;
-    border: 1px solid #1e3151;
-    box-shadow: 1px 1px 7px #888888;
-    padding: 7px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 10px;
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
 }
 
-#row-1 {
-    padding-top: 10px;
+.axis text {
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 0.9em;
 }
 
 .title {
     margin-top: 0px;
     font-family: Tw Cen MT Condensed, sans-serif;
-    text-align: center;
-    background-color: #6c83b5;
-    color: white;
+    font-size: 2em;
 }
 
-.thumb {  
-    max-height: 340px;
-    max-width: 300px;
-    border-radius: 6px;
-    border: 3px solid #4D4D4D;
-    box-shadow: 1px 1px 7px #888888;
-    margin-bottom: 20px;
-    margin: 20px auto;    
-    display: block;
-}
-
-.thumb:hover {
-    border-color: gold;
-}
-
-#contact-row {
-    padding-top: 20px;
-    min-height: 200px;
-}
-
-#contact {
+.labels {
     font-family: Tw Cen MT Condensed, sans-serif;
-    font-size: 18px;
-    color: #4D4D4D;
-    font-weight: bold;
 }
-
 .minilogo {
     height: 55px;
     width: 55px;
 }
 
-#links-web {
-    display: table;
-    height: 100px;
-    width: 100%;
-    text-align: center;
-    padding-top:10px;
-}
-
-#links-mobile {
-    display: table;
-    height: 100px;
-    width: 100%;
-    text-align: center;
-    padding-bottom: 20px;
-    padding-top: 10px;
-}
 
 #spanning {
     display: inline;
@@ -91,15 +47,7 @@
     letter-spacing: normal;
 }
 
-@media screen and (max-width : 768px){
-    .desk{display: none;}
-    .div-only-mobile{visibility:visible;}
-}
 
-@media screen and (min-width : 769px){
-    .div-only-mobile{display: none;}
-    .desk {display: visible;}
-}
 .shadow {
     text-shadow: 1px 1px black;
     text-align: center;
@@ -119,15 +67,8 @@
 .max-width{
     max-width: 450px
 }
-#scroll-button {
-    width: 60px;
-    height: 60px;
-    opacity: .7;
-}
+
 .no-padding {
   padding-left: 0;
   padding-right: 0;
-}
-#info-graphic {
-    width: 100%;
 }
