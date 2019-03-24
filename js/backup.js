@@ -58,31 +58,6 @@ function setMap(){
         var trpaBoundary = topojson.feature(boundary, boundary.objects.TRPA_Boundary_WGS84),
         tahoeBlockgroup = topojson.feature(blockgroup, blockgroup.objects.Tahoe_Block_Group_WGS84).features;
         
-        //variables for data join
-        var attrArray = ["Population", "Households", "Units"];
-
-        //loop through csv to assign each set of csv attribute values to geojson region
-        for (var i=0; i<csvData.length; i++){
-            var csvBlocks = csvData[i]; //the current block group
-            var csvKey = csvBlocks.GEOID; //the CSV primary key
-
-            //loop through geojson block groups to find correct block
-        for (var a=0; a<tahoeBlockgroup.length; a++){
-
-            var geojsonProps = tahoeBlockgroup[a].properties; //the current block group geojson properties
-            var geojsonKey = geojsonProps.GEOID; //the geojson primary key
-
-            //where primary keys match, transfer csv data to geojson properties object
-            if (geojsonKey == csvKey){
-
-                //assign all attributes and values
-                attrArray.forEach(function(attr){
-                    var val = parseFloat(csvBlocks[attr]); //get csv attribute value
-                    geojsonProps[attr] = val; //assign attribute and value to geojson properties
-                    });
-                };
-            };
-        };
         //add TRPA Boundary to map
         var bndry = map.append("path")
             .datum(trpaBoundary)
