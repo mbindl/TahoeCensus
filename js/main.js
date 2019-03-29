@@ -59,14 +59,24 @@ function setMap(){
         //join csv data to GeoJSON enumeration units
         tahoeBlockgroup = joinData(tahoeBlockgroup, csvData);
         
-//        //create the color scale
-//        var colorScale = makeColorScale(csvData);
+        //create the color scale
+        var colorScale = makeColorScale(csvData);
         
         //add enumeration units to the map
-        setEnumerationUnits(tahoeBlockgroup, map, path);
+        setEnumerationUnits(tahoeBlockgroup, map, path, colorScale);
     };
 }; //end of setMap()
-
+//function to test for data value and return color
+function choropleth(props, colorScale){
+    //make sure attribute value is a number
+    var val = parseFloat(props[expressed]);
+    //if attribute value exists, assign a color; otherwise assign gray
+    if (typeof val == 'number' && !isNaN(val)){
+        return colorScale(val);
+    } else {
+        return "#CCC";
+    };
+};
 // function to create graticules in background
 function setGraticule(map, path){
         // graticule generator
@@ -115,7 +125,7 @@ function joinData(tahoeBlockgroup, csvData){
     return tahoeBlockgroup;
 };
 
-function setEnumerationUnits(tahoeBlockgroup, map, path){
+function setEnumerationUnits(tahoeBlockgroup, map, path, colorScale){
         //add regions to map
         var blocks = map.selectAll(".blocks")
             .data(tahoeBlockgroup)
@@ -124,33 +134,46 @@ function setEnumerationUnits(tahoeBlockgroup, map, path){
             .attr("class", function(d){
                 return "blocks " + d.properties.GEOID;
             })
-            .attr("d", path);
-    }; 
-////function to create color scale generator
-//function makeColorScale(data){
-//    var colorClasses = [
-//        "#D4B9DA",
-//        "#C994C7",
-//        "#DF65B0",
-//        "#DD1C77",
-//        "#980043"
-//    ];
-//
-//    //create color scale generator
-//    var colorScale = d3.scaleQuantile()
-//        .range(colorClasses);
-//
-//    //build array of all values of the expressed attribute
-//    var domainArray = [];
-//    for (var i=0; i<data.length; i++){
-//        var val = parseFloat(data[i][expressed]);
-//        domainArray.push(val);
-//    };
-//
-//    //assign array of expressed values as scale domain
-//    colorScale.domain(domainArray);
-//
-//    return colorScale;
-//    }; 
+            .attr("d", path)
+            .style("fill", function(d){
+                return colorScale(d.properties, colorScale);
+        });
+};
+
+//function to create color scale generator
+function makeColorScale(data){
+    var colorClasses = [
+        "#D4B9DA",
+        "#C994C7",
+        "#DF65B0",
+        "#DD1C77",
+        "#980043"
+    ];
+
+       //create color scale generator
+    var colorScale = d3.scaleThreshold()
+        .range(colorClasses);
+
+    //build array of all values of the expressed attribute
+    var domainArray = [];
+    for (var i=0; i<data.length; i++){
+        var val = parseFloat(data[i][expressed]);
+        domainArray.push(val);
+    };
+
+    //cluster data using ckmeans clustering algorithm to create natural breaks
+    var clusters = ss.ckmeans(domainArray, 5);
+    //reset domain array to cluster minimums
+    domainArray = clusters.map(function(d){
+        return d3.min(d);
+    });
+    //remove first value from domain array to create class breakpoints
+    domainArray.shift();
+
+    //assign array of last 4 cluster minimums as domain
+    colorScale.domain(domainArray);
+
+    return colorScale;
+};
 
 })();// end of window load
