@@ -67,6 +67,9 @@ function setMap(){
         
          //add coordinated visualization to the map
         setChart(csvData, colorScale);
+        
+        // add dropdown
+        createDropdown(csvData);
     };
 }; //end of setMap()
 
@@ -197,11 +200,11 @@ function setChart(csvData, colorScale){
         .attr("width", chartInnerWidth)
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
-
+    
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scale.linear()
         .range([463, 0])
-        .domain([0, 100]);
+        .domain([0, 2287]);
 
     //set bars for each province
     var bars = chart.selectAll(".bar")
@@ -236,7 +239,7 @@ function setChart(csvData, colorScale){
         .text("Total " + expressed + " in each Block Group");
 
     //create vertical axis generator
-    var yAxis = d3.axisLeft()
+    var yAxis = d3.axisLeft(y)
         .scale(yScale)
         .orient("left");
 
@@ -253,5 +256,26 @@ function setChart(csvData, colorScale){
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
 };
+    
+//function to create a dropdown menu for attribute selection
+function createDropdown(csvData){
+    //add select element
+    var dropdown = d3.select("body")
+        .append("select")
+        .attr("class", "dropdown");
 
+    //add initial option
+    var titleOption = dropdown.append("option")
+        .attr("class", "titleOption")
+        .attr("disabled", "true")
+        .text("Select Attribute");
+
+    //add attribute name options
+    var attrOptions = dropdown.selectAll("attrOptions")
+        .data(attrArray)
+        .enter()
+        .append("option")
+        .attr("value", function(d){ return d })
+        .text(function(d){ return d });
+    };
 })();// end of window load
