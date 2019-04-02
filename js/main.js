@@ -22,7 +22,11 @@
         translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
     
     //create a scale to size bars proportionally to frame and for axis
+<<<<<<< HEAD
     var yScale = d3.scaleLinear()
+=======
+    var yScale = d3.scale.linear()
+>>>>>>> 2ca052d7bb9fd9cabb412d5947b059b1dd152711
         .range([463, 0])
         .domain([0, 2287]);
     
@@ -56,6 +60,7 @@ function setMap(){
         .projection(projection);
     
     
+<<<<<<< HEAD
     //use Promise.all to parallelize asynchronous data loading
     var promises = [];
     promises.push(d3.csv("data/census_data.csv")); //load attributes from csv
@@ -69,6 +74,13 @@ function setMap(){
         csvData = data[0];
         boundary = data[1];
         blockgroup = data[2];
+=======
+    // call back for data 
+    function callback(error, csvData, boundary, blockgroup){
+
+//        //place graticule on the map
+//        setGraticule(map, path);
+>>>>>>> 2ca052d7bb9fd9cabb412d5947b059b1dd152711
 
         //translate TRPA Boundary and Block Groups to TopoJSON
         var trpaBoundary = topojson.feature(boundary, boundary.objects.TRPA_Boundary_WGS84),
@@ -236,7 +248,11 @@ function setChart(csvData, colorScale){
         .attr("class", "chartTitle")
 
     //create vertical axis generator
+<<<<<<< HEAD
     var yAxis = d3.axisLeft() // Meiliu's modification changing to d3-v4.jss
+=======
+    var yAxis = d3.axisLeft()
+>>>>>>> 2ca052d7bb9fd9cabb412d5947b059b1dd152711
         .scale(yScale)
         
     //place axis
@@ -322,9 +338,12 @@ function updateChart(bars, n, colorScale){
         .style("fill", function(d){
             return choropleth(d, colorScale);
         });
+<<<<<<< HEAD
     //at the bottom of updateChart()...add text to chart title
     var chartTitle = d3.select(".chartTitle")
         .text("Total " + expressed + " in each Census Block Group");
+=======
+>>>>>>> 2ca052d7bb9fd9cabb412d5947b059b1dd152711
 };
 
 })();// end of window load
