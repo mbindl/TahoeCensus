@@ -239,7 +239,7 @@ function setChart(csvData, colorScale){
         .text("Total " + expressed + " in each Block Group");
 
     //create vertical axis generator
-    var yAxis = d3.axisLeft(y)
+    var yAxis = d3.axisLeft()
         .scale(yScale)
         .orient("left");
 
