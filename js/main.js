@@ -348,11 +348,13 @@ function updateChart(bars, n, colorScale){
 function highlight(props){
     //change stroke
     var selected = d3.selectAll("." + props.GEOID)
-        .style("stroke", "blue")
+        .style("stroke", "gold")
         .style("stroke-width", "2");
     //add popup on hover
     setLabel(props);
 };
+    
+// dehighlight units and bars after mouse move
 function dehighlight(props){
         var selected = d3.selectAll("." + props.GEOID)
             .style("stroke", function(){
@@ -380,7 +382,9 @@ function dehighlight(props){
 //    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 //}   
 //numberWithCommas(props[expressed]);
-    
+ 
+// why does .toFixed(2) break the bar chart labels?
+
 //function to create dynamic label
 function setLabel(props){
     //label content
