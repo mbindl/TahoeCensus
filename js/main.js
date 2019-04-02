@@ -1,7 +1,7 @@
 (function(){
     
     //pseudo-global variables
-    var attrArray = ["Population", "Households", "Units"];// variables for data join
+    var attrArray = ["Population Per Acre", "Households Per Acre", "Units Per Acre"];// variables for data join
     var expressed = attrArray[0]; //initial attribute
     
     //chart frame dimensions
@@ -17,7 +17,7 @@
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scaleLinear()
         .range([463, 0])
-        .domain([0, 2287]);
+        .domain([0, 20]);
     
 //begin script when window loads
 window.onload = setMap();
@@ -38,10 +38,10 @@ function setMap(){
 
     //create Albers equal area conic projection centered on Tahoe
     var projection = d3.geoAlbers()
-        .center([0, 39.09])
+        .center([0, 39.02])
         .rotate([120.03, 0, 0])
         .parallels([43, 62])
-        .scale(25000)
+        .scale(40000)
         .translate([width / 2, height / 2]);
     
     // draw geometry
@@ -58,7 +58,7 @@ function setMap(){
 
     function callback(data){
         
-        // Meiliu's modification using promises
+        // using promises to call indexed layers
         csvData = data[0];
         boundary = data[1];
         blockgroup = data[2];
@@ -190,7 +190,18 @@ function setEnumerationUnits(tahoeBlockgroup, map, path, colorScale){
             .attr("d", path)
             .style("fill", function(d){
             return choropleth(d.properties, colorScale);
-            });
+            })
+            .on("mouseover", function(d){
+            highlight(d.properties);
+            })
+                
+            .on("mouseout", function(d){
+            dehighlight(d.properties);
+            })
+            .on("mousemove", moveLabel);
+        
+        var desc = blocks.append("desc")
+            .text('{"stroke": "rgba(0, 0, 0, 0.3)", "stroke-width": "0.8px"}');
 };
     
 //function to create coordinated bar chart
@@ -221,7 +232,12 @@ function setChart(csvData, colorScale){
             return "bar " + d.GEOID;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
-    
+        .on("mouseover", highlight)
+        .on("mouseout", dehighlight)
+        .on("mousemove", moveLabel);
+    //
+    var desc = bars.append("desc")
+        .text('{"stroke": "none", "stroke-width": "0px"}');
     //create a text element for the chart title
     var chartTitle = chart.append("text")
         .attr("x", 40)
@@ -284,15 +300,23 @@ function changeAttribute(attribute, csvData){
 
     //recolor enumeration units
     var blocks = d3.selectAll(".blocks")
+        .transition()
+        .duration(1000)
         .style("fill", function(d){
             return choropleth(d.properties, colorScale)
         });
-        //re-sort, resize, and recolor bars
+    
+    //re-sort, resize, and recolor bars
     var bars = d3.selectAll(".bar")
         //re-sort bars
         .sort(function(a, b){
             return b[expressed] - a[expressed];
         })
+        .transition() //add animation
+        .delay(function(d, i){
+            return i * 20
+        })
+        .duration(500);
     
     // update bars based on data
     updateChart(bars, csvData.length, colorScale);
@@ -317,7 +341,81 @@ function updateChart(bars, n, colorScale){
         });
     //add text to chart title
     var chartTitle = d3.select(".chartTitle")
-        .text(expressed + " per acre");
+        .text(expressed);
 };
 
+//function to highlight enumeration units and bars
+function highlight(props){
+    //change stroke
+    var selected = d3.selectAll("." + props.GEOID)
+        .style("stroke", "blue")
+        .style("stroke-width", "2");
+    //add popup on hover
+    setLabel(props);
+};
+function dehighlight(props){
+        var selected = d3.selectAll("." + props.GEOID)
+            .style("stroke", function(){
+                return getStyle(this, "stroke")
+            })
+            .style("stroke-width", function(){
+                return getStyle(this, "stroke-width")
+            });
+
+        function getStyle(element, styleName){
+            var styleText = d3.select(element)
+                .select("desc")
+                .text();
+
+            var styleObject = JSON.parse(styleText);
+
+            return styleObject[styleName];
+        };
+        d3.select(".infolabel")
+            .remove();
+};
+
+//// add commas
+//function numberWithCommas(x) {
+//    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+//}   
+//numberWithCommas(props[expressed]);
+    
+//function to create dynamic label
+function setLabel(props){
+    //label content
+    var labelAttribute = expressed + ": " + props[expressed];
+
+    //create info label div
+    var infolabel = d3.select("body")
+        .append("div")
+        .attr("class", "infolabel")
+        .attr("id", props.GEOID + "_label")
+        .html(labelAttribute);       
+};
+    
+//function to move info label with mouse
+function moveLabel(){
+    //get width of label
+    var labelWidth = d3.select(".infolabel")
+        .node()
+        .getBoundingClientRect()
+        .width;
+
+    //use coordinates of mousemove event to set label coordinates
+    var x1 = d3.event.clientX + 10,
+        y1 = d3.event.clientY - 35,
+        x2 = d3.event.clientX - labelWidth - 10,
+        y2 = d3.event.clientY + 25;
+
+    //horizontal label coordinate, testing for overflow
+    var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1; 
+    //vertical label coordinate, testing for overflow
+    var y = d3.event.clientY < 75 ? y2 : y1; 
+
+    d3.select(".infolabel")
+        .style("left", x + "px")
+        .style("top", y + "px");
+};
+    
 })();// end of window load

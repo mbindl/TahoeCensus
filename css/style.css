@@ -30,15 +30,14 @@
 }
 
 .chartBackground {
-    fill: rgba(128,128,128,.2);
+    fill: rgba(128,128,128,.3);
 }
 
 .chartFrame {
     fill: none;
     stroke: #999;
-    border: medium solid #999;
-/*    stroke-width: 3px;*/
-/*    shape-rendering: crispEdges;*/
+    stroke-width: 2px;
+    shape-rendering: crispEdges;
 }
 
 .axis path,
@@ -56,8 +55,8 @@
 }
 .bndry {
     fill: #FFF;
-    stroke: #CCC;
-    stroke-width: 12px;
+    stroke: #6c83b5;
+    stroke-width: 2px;
 }
 
 .dropdown {
@@ -84,6 +83,25 @@ option {
     stroke-width: 1px;
 }
 */
+
+.infolabel {
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 1em;
+    position: absolute;
+    height: 50px;
+    min-width: 100px;
+    color: #fff;
+    background-color: #000;
+    border: solid thin #fff;
+    padding: 5px 10px;
+    top: -75px;
+}
+.infolabel h1 {
+    margin: 0 20px 0 0;
+    padding: 0;
+    display: inline-block;
+    line-height: 1em;
+}
 
 .gratLines {
     fill: none;
