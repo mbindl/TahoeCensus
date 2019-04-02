@@ -24,8 +24,8 @@
 }
 
 .chartTitle {
-    font-family: sans-serif;
-    font-size: 1.5em;
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 1.4em;
     font-weight: bold;
 }
 
@@ -36,8 +36,9 @@
 .chartFrame {
     fill: none;
     stroke: #999;
-    stroke-width: 3px;
-    shape-rendering: crispEdges;
+    border: medium solid #999;
+/*    stroke-width: 3px;*/
+/*    shape-rendering: crispEdges;*/
 }
 
 .axis path,
@@ -49,8 +50,8 @@
 }
 
 .axis text {
-    font-family: sans-serif;
-    font-size: 0.8em;
+    font-family: Tw Cen MT Condensed, sans-serif;
+    font-size: 1.0em;
     fill: #999;
 }
 .bndry {
@@ -64,7 +65,7 @@
     top: 30px;
     left: 40px;
     z-index: 10;
-    font-family: sans-serif;
+    font-family: Tw Cen MT Condensed, sans-serif;
     font-size: 1em;
     font-weight: bold;
     padding: 2px;
