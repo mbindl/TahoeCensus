@@ -1,8 +1,30 @@
+/*eslint-env jquery*/
+/*eslint-disable no-extra-semi*/
+/*eslint-disable no-unused-vars*/
+/*eslint-disable no-undef*/
+/*eslint-disable no-console*/
+/*eslint-disable no-unreachable*/
+
 (function(){
     
     //pseudo-global variables
     var attrArray = ["Population", "Households", "Units"];// variables for data join
     var expressed = attrArray[0]; //initial attribute
+    
+    //chart frame dimensions
+    var chartWidth = window.innerWidth * 0.425,
+        chartHeight = 473,
+        leftPadding = 25,
+        rightPadding = 2,
+        topBottomPadding = 5,
+        chartInnerWidth = chartWidth - leftPadding - rightPadding,
+        chartInnerHeight = chartHeight - topBottomPadding * 2,
+        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
+    
+    //create a scale to size bars proportionally to frame and for axis
+    var yScale = d3.scaleLinear()
+        .range([463, 0])
+        .domain([0, 2287]);
     
 //begin script when window loads
 window.onload = setMap();
@@ -33,18 +55,20 @@ function setMap(){
     var path = d3.geoPath()
         .projection(projection);
     
-    //use queue to parallelize asynchronous data loading
-    d3.queue()
-        .defer(d3.csv, "data/census_data.csv") //load attributes from csv
-        .defer(d3.json, "data/TRPA_Boundary.topojson")//load background data
-        .defer(d3.json, "data/Tahoe_Block_Group.topojson")//load choropleth spatial data
-        .await(callback);
     
-    // call back for data 
-    function callback(error, csvData, boundary, blockgroup){
-        console.log(csvData);
-        //place graticule on the map
-        setGraticule(map, path);
+    //use Promise.all to parallelize asynchronous data loading
+    var promises = [];
+    promises.push(d3.csv("data/census_data.csv")); //load attributes from csv
+    promises.push(d3.json("data/TRPA_Boundary.topojson")); //load background spatial data
+    promises.push(d3.json("data/Tahoe_Block_Group.topojson")); //load choropleth spatial data
+    Promise.all(promises).then(callback);
+
+    function callback(data){
+        
+        // Meiliu's modification using promises
+        csvData = data[0];
+        boundary = data[1];
+        blockgroup = data[2];
 
         //translate TRPA Boundary and Block Groups to TopoJSON
         var trpaBoundary = topojson.feature(boundary, boundary.objects.TRPA_Boundary_WGS84),
@@ -64,12 +88,13 @@ function setMap(){
         
         //add enumeration units to the map
         setEnumerationUnits(tahoeBlockgroup, map, path, colorScale);
-        
-         //add coordinated visualization to the map
-        setChart(csvData, colorScale);
-        
+                        
         // add dropdown
         createDropdown(csvData);
+        
+        //add coordinated visualization to the map
+        setChart(csvData, colorScale);
+
     };
 }; //end of setMap()
 
@@ -84,7 +109,7 @@ function makeColorScale(data){
     ];
 
     //create color scale generator
-    var colorScale = d3.scale.quantile()
+    var colorScale = d3.scaleQuantile() // Meiliu's modification
         .range(colorClasses);
 
     //build two-value array of minimum and maximum expressed attribute values
@@ -110,26 +135,26 @@ function choropleth(props, colorScale){
     };
 };
     
-// function to create graticules in background
-function setGraticule(map, path){
-        // graticule generator
-        var graticule = d3.geoGraticule()
-            .step([1, 1]); //place graticule lines every 5 degrees of longitude and latitude
-        
-        //create graticule background
-        var gratBackground = map.append("path")
-            .datum(graticule.outline()) //bind graticule background
-            .attr("class", "gratBackground") //assign class for styling
-            .attr("d", path) //project graticule
-        
-        //create graticule lines
-        var gratLines = map.selectAll(".gratLines") //select graticule elements that will be created
-            .data(graticule.lines()) //bind graticule lines to each element to be created
-            .enter() //create an element for each datum
-            .append("path") //append each element to the svg as a path element
-            .attr("class", "gratLines") //assign class for styling
-            .attr("d", path); //project graticule lines
-};
+//// function to create graticules in background
+//function setGraticule(map, path){
+//        // graticule generator
+//        var graticule = d3.geoGraticule()
+//            .step([1, 1]); //place graticule lines every 5 degrees of longitude and latitude
+//        
+//        //create graticule background
+//        var gratBackground = map.append("path")
+//            .datum(graticule.outline()) //bind graticule background
+//            .attr("class", "gratBackground") //assign class for styling
+//            .attr("d", path) //project graticule
+//        
+//        //create graticule lines
+//        var gratLines = map.selectAll(".gratLines") //select graticule elements that will be created
+//            .data(graticule.lines()) //bind graticule lines to each element to be created
+//            .enter() //create an element for each datum
+//            .append("path") //append each element to the svg as a path element
+//            .attr("class", "gratLines") //assign class for styling
+//            .attr("d", path); //project graticule lines
+//};
 
 // join csv data to block group
 function joinData(tahoeBlockgroup, csvData){
@@ -177,16 +202,6 @@ function setEnumerationUnits(tahoeBlockgroup, map, path, colorScale){
     
 //function to create coordinated bar chart
 function setChart(csvData, colorScale){
-    //chart frame dimensions
-    var chartWidth = window.innerWidth * 0.425,
-        chartHeight = 473,
-        leftPadding = 25,
-        rightPadding = 2,
-        topBottomPadding = 5,
-        chartInnerWidth = chartWidth - leftPadding - rightPadding,
-        chartInnerHeight = chartHeight - topBottomPadding * 2,
-        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
-
     //create a second svg element to hold the bar chart
     var chart = d3.select("body")
         .append("svg")
@@ -201,11 +216,6 @@ function setChart(csvData, colorScale){
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
     
-    //create a scale to size bars proportionally to frame and for axis
-    var yScale = d3.scale.linear()
-        .range([463, 0])
-        .domain([0, 2287]);
-
     //set bars for each province
     var bars = chart.selectAll(".bar")
         .data(csvData)
@@ -218,31 +228,17 @@ function setChart(csvData, colorScale){
             return "bar " + d.GEOID;
         })
         .attr("width", chartInnerWidth / csvData.length - 1)
-        .attr("x", function(d, i){
-            return i * (chartInnerWidth / csvData.length) + leftPadding;
-        })
-        .attr("height", function(d, i){
-            return 463 - yScale(parseFloat(d[expressed]));
-        })
-        .attr("y", function(d, i){
-            return yScale(parseFloat(d[expressed])) + topBottomPadding;
-        })
-        .style("fill", function(d){
-            return choropleth(d, colorScale);
-        });
-
+    
     //create a text element for the chart title
     var chartTitle = chart.append("text")
         .attr("x", 40)
         .attr("y", 40)
         .attr("class", "chartTitle")
-        .text("Total " + expressed + " in each Block Group");
 
     //create vertical axis generator
-    var yAxis = d3.axisLeft(y)
+    var yAxis = d3.axisLeft() // Meiliu's modification changing to d3-v4.jss
         .scale(yScale)
-        .orient("left");
-
+        
     //place axis
     var axis = chart.append("g")
         .attr("class", "axis")
@@ -255,6 +251,9 @@ function setChart(csvData, colorScale){
         .attr("width", chartInnerWidth)
         .attr("height", chartInnerHeight)
         .attr("transform", translate);
+    
+    // update bars based on data
+    updateChart(bars, csvData.length, colorScale);
 };
     
 //function to create a dropdown menu for attribute selection
@@ -262,7 +261,10 @@ function createDropdown(csvData){
     //add select element
     var dropdown = d3.select("body")
         .append("select")
-        .attr("class", "dropdown");
+        .attr("class", "dropdown")
+        .on("change", function(){
+            changeAttribute(this.value, csvData)
+        });
 
     //add initial option
     var titleOption = dropdown.append("option")
@@ -278,4 +280,51 @@ function createDropdown(csvData){
         .attr("value", function(d){ return d })
         .text(function(d){ return d });
     };
+    
+//dropdown change listener handler
+function changeAttribute(attribute, csvData){
+    //change the expressed attribute
+    expressed = attribute;
+
+    //recreate the color scale
+    var colorScale = makeColorScale(csvData);
+
+    //recolor enumeration units
+    var blocks = d3.selectAll(".blocks")
+        .style("fill", function(d){
+            return choropleth(d.properties, colorScale)
+        });
+        //re-sort, resize, and recolor bars
+    var bars = d3.selectAll(".bar")
+        //re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
+    
+    // update bars based on data
+    updateChart(bars, csvData.length, colorScale);
+};
+
+//function to position, size, and color bars in chart
+function updateChart(bars, n, colorScale){
+    //position bars
+    bars.attr("x", function(d, i){
+            return i * (chartInnerWidth / n) + leftPadding;
+        })
+        //size/resize bars
+        .attr("height", function(d, i){
+            return 463 - yScale(parseFloat(d[expressed]));
+        })
+        .attr("y", function(d, i){
+            return yScale(parseFloat(d[expressed])) + topBottomPadding;
+        })
+        //color/recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale);
+        });
+    //at the bottom of updateChart()...add text to chart title
+    var chartTitle = d3.select(".chartTitle")
+        .text("Total " + expressed + " in each Census Block Group");
+};
+
 })();// end of window load
