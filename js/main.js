@@ -1,13 +1,13 @@
 (function(){
     
     //pseudo-global variables
-    var attrArray = ["Population Per Acre", "Households Per Acre", "Units Per Acre"];// variables for data join
+    var attrArray = ["Population", "Households", "Units", "Population Per Acre", "Households Per Acre", "Units Per Acre"];// variables for data join
     var expressed = attrArray[0]; //initial attribute
     
     //chart frame dimensions
     var chartWidth = window.innerWidth * 0.425,
-        chartHeight = 473,
-        leftPadding = 25,
+        chartHeight = 463,
+        leftPadding = 20,
         rightPadding = 2,
         topBottomPadding = 5,
         chartInnerWidth = chartWidth - leftPadding - rightPadding,
@@ -17,7 +17,7 @@
     //create a scale to size bars proportionally to frame and for axis
     var yScale = d3.scaleLinear()
         .range([463, 0])
-        .domain([0, 20]);
+        .domain([0, 2300]);
     
 //begin script when window loads
 window.onload = setMap();
@@ -27,7 +27,7 @@ function setMap(){
     
     //map frame dimensions
     var width = window.innerWidth * 0.5,
-        height = 460;
+        height = 463;
 
     //create new svg container for the map
     var map = d3.select("body")
@@ -41,13 +41,12 @@ function setMap(){
         .center([0, 39.02])
         .rotate([120.03, 0, 0])
         .parallels([43, 62])
-        .scale(40000)
+        .scale(70000)
         .translate([width / 2, height / 2]);
     
     // draw geometry
     var path = d3.geoPath()
         .projection(projection);
-    
     
     //use Promise.all to parallelize asynchronous data loading
     var promises = [];
@@ -85,6 +84,9 @@ function setMap(){
         // add dropdown
         createDropdown(csvData);
         
+        // add legend
+        createLegend(csvData, colorScale);
+        
         //add coordinated visualization to the map
         setChart(csvData, colorScale);
 
@@ -93,17 +95,10 @@ function setMap(){
 
 //function to create color scale generator
 function makeColorScale(data){
-    var colorClasses = [
-        "#ABFAFA",
-        "#68C3C3",
-        "#2C8484",
-        "#004E4E",
-        "#002F2F"
-    ];
-
     //create color scale generator
     var colorScale = d3.scaleQuantile()
-        .range(colorClasses);
+        .range(colorbrewer.Blues[5])
+        .domain([0,5]);
 
     //build two-value array of minimum and maximum expressed attribute values
     var minmax = [
@@ -128,27 +123,6 @@ function choropleth(props, colorScale){
     };
 };
     
-//// function to create graticules in background
-//function setGraticule(map, path){
-//        // graticule generator
-//        var graticule = d3.geoGraticule()
-//            .step([1, 1]); //place graticule lines every 5 degrees of longitude and latitude
-//        
-//        //create graticule background
-//        var gratBackground = map.append("path")
-//            .datum(graticule.outline()) //bind graticule background
-//            .attr("class", "gratBackground") //assign class for styling
-//            .attr("d", path) //project graticule
-//        
-//        //create graticule lines
-//        var gratLines = map.selectAll(".gratLines") //select graticule elements that will be created
-//            .data(graticule.lines()) //bind graticule lines to each element to be created
-//            .enter() //create an element for each datum
-//            .append("path") //append each element to the svg as a path element
-//            .attr("class", "gratLines") //assign class for styling
-//            .attr("d", path); //project graticule lines
-//};
-
 // join csv data to block group
 function joinData(tahoeBlockgroup, csvData){
         //loop through csv to assign each set of csv attribute values to geojson block group
@@ -203,6 +177,28 @@ function setEnumerationUnits(tahoeBlockgroup, map, path, colorScale){
         var desc = blocks.append("desc")
             .text('{"stroke": "rgba(0, 0, 0, 0.3)", "stroke-width": "0.8px"}');
 };
+
+// function to create legend
+function createLegend(csvData, colorScale){
+    var svg = d3.select("svg")
+        .attr("class", "legend");
+//        .on("change", function(){
+//            changeAttribute(this.value, csvData)
+//        });
+    
+    var colorLegend = d3.legendColor()
+        .labelFormat(d3.format(",.0f"))
+        .scale(colorScale)
+        .shapePadding(3)
+        .shapeWidth(20)
+        .shapeHeight(10)
+        .labelOffset(12);
+    
+    //place legend
+    svg.append("g")
+        .attr("transform", "translate(20, 340)")
+        .call(colorLegend);
+    };
     
 //function to create coordinated bar chart
 function setChart(csvData, colorScale){
@@ -238,6 +234,7 @@ function setChart(csvData, colorScale){
     //
     var desc = bars.append("desc")
         .text('{"stroke": "none", "stroke-width": "0px"}');
+    
     //create a text element for the chart title
     var chartTitle = chart.append("text")
         .attr("x", 40)
@@ -318,6 +315,28 @@ function changeAttribute(attribute, csvData){
         })
         .duration(500);
     
+    //build array of all values of the expressed attribute
+    var domainArray = [];
+       for (var i=0; i<csvData.length; i++){
+           var val = parseFloat(csvData[i][expressed]);
+           domainArray.push(val);
+       };
+
+       var max = d3.max(domainArray);
+
+       yScale = d3.scaleLinear()
+           .range([590, 0])
+           .domain([0, max+1]);
+
+       //create vertical axis generator
+       var yAxis = d3.axisLeft()
+           .scale(yScale);
+
+       //place axis
+       var axis = d3.selectAll(".axis")
+           .attr("transform", translate)
+           .call(yAxis);
+    
     // update bars based on data
     updateChart(bars, csvData.length, colorScale);
 };
@@ -377,18 +396,10 @@ function dehighlight(props){
             .remove();
 };
 
-//// add commas
-//function numberWithCommas(x) {
-//    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-//}   
-//numberWithCommas(props[expressed]);
- 
-// why does .toFixed(2) break the bar chart labels?
-
 //function to create dynamic label
 function setLabel(props){
     //label content
-    var labelAttribute = expressed + ": " + props[expressed];
+    var labelAttribute = expressed + ": " + d3.format(",.2f")(props[expressed]);
 
     //create info label div
     var infolabel = d3.select("body")
@@ -423,3 +434,4 @@ function moveLabel(){
 };
     
 })();// end of window load
+
