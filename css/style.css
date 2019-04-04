@@ -38,7 +38,7 @@
     font-size: 1.0em;
     fill: #999;
 }
-.bndry {
+.buildings {
     fill: #FFF;
     stroke: #6c83b5;
     stroke-width: 2px;
@@ -64,13 +64,20 @@
     background-color: #fff;
 }
 
-option {
+.option {
     font-weight: normal;
 }
 
 .blocks {
-    stroke: #999;;
+    stroke: #999;
     stroke-width: 0.5px;
+    fill-opacity:0.9;
+}
+
+.bars {
+    stroke: #999;
+    stroke-width: 0.5px;
+    fill-opacity:0.9;
 }
 
 .infolabel {
