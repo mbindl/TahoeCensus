@@ -38,7 +38,7 @@ function setMap(){
     
     //create a text element for the map title
     var mapTitle = map.append("text")
-        .attr("x", 15)
+        .attr("x", 12)
         .attr("y", 40)
         .attr("class", "title");
     
@@ -69,7 +69,7 @@ function setMap(){
         .center([0, 39.02])
         .rotate([120.13, 0, 0])
         .parallels([43, 62])
-        .scale(50000)
+        .scale(60000)
         .translate([width / 2, height / 2]);
     
     // draw geometry
