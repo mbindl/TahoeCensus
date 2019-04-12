@@ -43,7 +43,7 @@ function setMap(){
         .attr("class", "title");
     
     var title = d3.select(".title")
-        .text("Tahoe Housing");
+        .text("Tahoe Houses");
     
     //create a text element for the map subtitle
     var mapsubTitle = map.append("text")
@@ -52,7 +52,7 @@ function setMap(){
         .attr("class", "subtitle");
     
     var subtitle = d3.select(".subtitle")
-        .text("Is it for the Tourists?");
+        .text("Are they for the Tourists?");
     
     //create a text element for the data sources
     var creditText = map.append("text")
@@ -69,7 +69,7 @@ function setMap(){
         .center([0, 39.02])
         .rotate([120.13, 0, 0])
         .parallels([43, 62])
-        .scale(60000)
+        .scale(70000)
         .translate([width / 2, height / 2]);
     
     // draw geometry
