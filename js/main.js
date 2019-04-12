@@ -6,8 +6,8 @@
     
     //chart frame dimensions
     var chartWidth = window.innerWidth * 0.425,
-        chartHeight = 515,
-        leftPadding = 25,
+        chartHeight = 745,
+        leftPadding = 20,
         rightPadding = 2,
         topBottomPadding = 5,
         chartInnerWidth = chartWidth - leftPadding - rightPadding,
@@ -27,7 +27,7 @@ function setMap(){
     
     //map frame dimensions
     var width = window.innerWidth * 0.5,
-        height = 530;
+        height = 760;
 
     //create new svg container for the map
     var map = d3.select("body")
@@ -47,7 +47,7 @@ function setMap(){
     
     //create a text element for the map subtitle
     var mapsubTitle = map.append("text")
-        .attr("x", 20)
+        .attr("x", 15)
         .attr("y", 65)
         .attr("class", "subtitle");
     
@@ -56,8 +56,8 @@ function setMap(){
     
     //create a text element for the data sources
     var creditText = map.append("text")
-        .attr("x", 20)
-        .attr("y", 525)
+        .attr("x", 15)
+        .attr("y", 755)
         .attr("class", "credits");
     
 
@@ -220,7 +220,7 @@ function createLegend(colorScale){
     
     //place legend
     svg.append("g")
-        .attr("transform", "translate(20, 435)")
+        .attr("transform", "translate(15, 655)")
         .call(colorLegend);
     };
     
